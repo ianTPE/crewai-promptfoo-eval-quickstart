@@ -47,7 +47,7 @@ sudo apt install python3-venv
 
 ```bash
 # Clone this repo
-git clone https://github.com/<your-username>/crewai-promptfoo-eval-quickstart.git
+git clone https://github.com/ianTPE/crewai-promptfoo-eval-quickstart.git
 cd crewai-promptfoo-eval-quickstart
 
 # Python dependencies
@@ -262,7 +262,7 @@ Before publishing this repo:
 - Run `python -m py_compile agent.py`.
 - Run `npm run eval` with a real `OPENAI_API_KEY`.
 - Open `npm run view` and verify the latest run is inspectable.
-- Replace `git clone https://github.com/<your-username>/crewai-promptfoo-eval-quickstart.git` above after the GitHub repo exists.
+- Replace `git clone https://github.com/ianTPE/crewai-promptfoo-eval-quickstart.git` above after the GitHub repo exists.
 - Add a short GitHub description, for example: `CrewAI support-ticket eval quickstart using promptfoo`.
 - Keep result exports out of git unless you intentionally want to publish a sample report.
 

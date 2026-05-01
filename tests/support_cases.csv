@@ -1,0 +1,9 @@
+ticket,expected_category,expected_priority
+"I want to request a dark mode option for the dashboard.",feature_request,low
+"I can't log in after resetting my password — the reset link seems expired.",account,medium
+"Payment failed when I tried to upgrade to the Pro plan with my Visa card.",billing,high
+"The export to CSV feature returns an empty file every time.",technical,high
+"I noticed a vulnerability in your API that exposes other users' email addresses.",security,critical
+"Can you add bulk delete for old support tickets?",feature_request,low
+"My team member was removed from the workspace but still shows as active.",account,medium
+"I was billed for a plan I already cancelled two months ago.",billing,high

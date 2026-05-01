@@ -1,0 +1,15 @@
+.env
+.codex
+.home/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.promptfoo/
+.local/
+promptfoo-results.*
+results.json
+results.yaml
+node_modules/
+npm-debug.log*
+.DS_Store

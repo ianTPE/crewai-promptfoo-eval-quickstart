@@ -1,0 +1,14 @@
+{
+  "name": "crewai-promptfoo-eval-quickstart",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Minimal CrewAI eval quickstart using promptfoo assertions and regression cases.",
+  "license": "MIT",
+  "scripts": {
+    "eval": "HOME=$PWD/.home XDG_DATA_HOME=$PWD/.local/share PROMPTFOO_CONFIG_DIR=$PWD/.promptfoo promptfoo eval --env-file .env",
+    "view": "promptfoo view"
+  },
+  "devDependencies": {
+    "promptfoo": "latest"
+  }
+}

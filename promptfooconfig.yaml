@@ -1,0 +1,247 @@
+# promptfoo configuration for CrewAI Support Ticket Triage evaluation
+# https://www.promptfoo.dev/docs/configuration/
+
+description: "CrewAI Support Ticket Triage — promptfoo eval quickstart"
+
+providers:
+  - id: "python:agent.py:call_api"
+    label: "crewai-triage"
+
+prompts:
+  - "{{ticket}}"
+
+tests:
+  # ---- Inline test cases ----
+
+  - vars:
+      ticket: "I was charged twice for my monthly subscription this week."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'billing';
+        label: "category=billing"
+      # Tool-usage assertion: verify the agent consulted the knowledge base
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return Array.isArray(d.tools_used) && d.tools_used.includes('search_knowledge_base');
+        label: "used knowledge base tool"
+
+  - vars:
+      ticket: "The app crashes every time I open the dashboard on Safari."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'technical';
+        label: "category=technical"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const valid = ['critical','high','medium','low'];
+          return valid.includes(d.priority);
+        label: "priority is valid"
+
+  - vars:
+      ticket: "Someone logged into my account from a device I don't recognize and changed my email address."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'security';
+        label: "category=security"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return ['critical','high'].includes(d.priority);
+        label: "priority=critical or high"
+      # LLM-rubric: evaluate the quality of the triage reasoning
+      # Change the provider if using OpenAI: provider: openai:gpt-4o-mini
+      - type: llm-rubric
+        provider: togetherai:zai-org/GLM-5.1
+        value: |
+          The triage should identify this as a security issue with critical or high priority.
+          The rationale should reference unauthorized access, data exposure, or vulnerability handling.
+          The next_action should involve alerting the security team, investigating the vulnerability,
+          or taking immediate protective measures.
+        label: "rubric: security triage quality"
+      # Tool-usage assertion: security incidents should trigger a KB search
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return Array.isArray(d.tools_used) && d.tools_used.includes('search_knowledge_base');
+        label: "used knowledge base tool"
+
+  # ---- Regression suite (inline) ----
+  # These test structured output validity for a broader set of tickets.
+  # Category-specific assertions are not used here — this is a regression guard
+  # that catches broken JSON output or missing fields after prompt changes.
+  # For CSV-based loading, see tests/support_cases.csv and the README section
+  # "Test Cases from CSV".
+
+  - vars:
+      ticket: "I want to request a dark mode option for the dashboard."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const validCategories = ['billing','technical','account','feature_request','security'];
+          return validCategories.includes(d.category);
+        label: "category is valid"
+
+  - vars:
+      ticket: "I can't log in after resetting my password — the reset link seems expired."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'account';
+        label: "category=account"
+
+  - vars:
+      ticket: "Payment failed when I tried to upgrade to the Pro plan with my Visa card."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'billing';
+        label: "category=billing"
+
+  - vars:
+      ticket: "The export to CSV feature returns an empty file every time."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'technical';
+        label: "category=technical"
+
+  - vars:
+      ticket: "I noticed a vulnerability in your API that exposes other users' email addresses."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'security';
+        label: "category=security"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return ['critical','high'].includes(d.priority);
+        label: "priority=critical or high"
+
+  - vars:
+      ticket: "Can you add bulk delete for old support tickets?"
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'feature_request';
+        label: "category=feature_request"
+
+  - vars:
+      ticket: "My team member was removed from the workspace but still shows as active."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'account';
+        label: "category=account"
+
+  - vars:
+      ticket: "I was billed for a plan I already cancelled two months ago."
+    assert:
+      - type: is-json
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          const required = ['category','priority','rationale','next_action','tools_used'];
+          const missing = required.filter(k => !(k in d));
+          return missing.length === 0;
+        label: "all 5 fields present"
+      - type: javascript
+        value: |
+          const d = JSON.parse(output);
+          return d.category === 'billing';
+        label: "category=billing"

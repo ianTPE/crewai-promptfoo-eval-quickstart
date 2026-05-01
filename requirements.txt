@@ -1,0 +1,1 @@
+crewai[litellm]>=1.14.0

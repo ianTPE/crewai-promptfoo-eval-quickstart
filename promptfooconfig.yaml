@@ -81,9 +81,7 @@ tests:
           return ['critical','high'].includes(d.priority);
         label: "priority=critical or high"
       # LLM-rubric: evaluate the quality of the triage reasoning
-      # Change the provider if using OpenAI: provider: openai:gpt-4o-mini
       - type: llm-rubric
-        provider: togetherai:zai-org/GLM-5.1
         value: |
           The triage should identify this as a security issue with critical or high priority.
           The rationale should reference unauthorized access, data exposure, or vulnerability handling.

@@ -15,34 +15,12 @@ from crewai.tools import tool
 
 
 # ---------------------------------------------------------------------------
-# LLM setup — reads from environment.
+# LLM setup — reads OPENAI_API_KEY from environment.
+# Override the model with CREWAI_MODEL if needed (e.g. openai/gpt-4o).
 # ---------------------------------------------------------------------------
-def resolve_model() -> str:
-    """Resolve a CrewAI/LiteLLM model id from common env vars."""
-    crewai_model = os.getenv("CREWAI_MODEL")
-    if crewai_model:
-        return crewai_model
-
-    together_model = os.getenv("TOGETHER_MODEL_CHAT")
-    if together_model:
-        if together_model.startswith(("together_ai/", "together/")):
-            return together_model
-        return f"together_ai/{together_model}"
-
-    return "openai/gpt-4o-mini"
-
-
-def resolve_api_key() -> str:
-    """Prefer the key that matches the selected model/provider."""
-    model = resolve_model()
-    if model.startswith(("together_ai/", "together/")):
-        return os.getenv("TOGETHERAI_API_KEY", "")
-    return os.getenv("OPENAI_API_KEY", "")
-
-
 llm = LLM(
-    model=resolve_model(),
-    api_key=resolve_api_key(),
+    model=os.getenv("CREWAI_MODEL", "openai/gpt-4o-mini"),
+    api_key=os.getenv("OPENAI_API_KEY", ""),
     temperature=0.2,
 )
 

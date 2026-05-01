@@ -35,7 +35,7 @@ A minimal, runnable example that shows how to **evaluate a CrewAI agent's output
 
 - Python 3.10+
 - Node.js 18+ (for promptfoo)
-- An API key for your chosen CrewAI LLM provider. This quickstart defaults to OpenAI; TogetherAI is included as an optional alternative.
+- An OpenAI API key
 
 On Debian/Ubuntu, install the venv package first if `python -m venv .venv` fails:
 
@@ -67,23 +67,10 @@ npm install
 
 ```bash
 cp .env.example .env
-# Edit .env and add either TOGETHERAI_API_KEY or OPENAI_API_KEY
+# Edit .env and add your OPENAI_API_KEY
 ```
 
-This repo supports these common setups:
-
-```bash
-# TogetherAI
-TOGETHERAI_API_KEY=replace-me
-TOGETHER_API_KEY=replace-me              # Same value — needed for llm-rubric grading
-TOGETHER_MODEL_CHAT=zai-org/GLM-5.1
-
-# OpenAI
-OPENAI_API_KEY=replace-me
-CREWAI_MODEL=openai/gpt-4o-mini
-```
-
-If `TOGETHER_MODEL_CHAT` is set without a provider prefix, `agent.py` will pass it to CrewAI as `together_ai/<model>`.
+The default model is `openai/gpt-4o-mini`. Override it with `CREWAI_MODEL` if needed (e.g. `openai/gpt-4o`).
 
 If you installed CrewAI with `uv`, make sure promptfoo uses the same Python environment:
 
@@ -146,7 +133,7 @@ Defines:
 
 - **Provider**: `python:agent.py:call_api` — points to our CrewAI agent
 - **Prompts**: `{{ticket}}` — each test case sends its ticket text to the Python provider
-- **Test cases**: 10 tickets covering all 5 categories with various assertion patterns including `llm-rubric` and tool-usage checks
+- **Test cases**: 11 tickets covering all 5 categories with various assertion patterns including `llm-rubric` and tool-usage checks
 
 ### Assertions Used
 
@@ -246,11 +233,11 @@ For cases where exact matching is too brittle (e.g., edge-case tickets), use `ll
   label: "rubric: security triage quality"
 ```
 
-The `llm-rubric` assertion uses OpenAI by default (requires `OPENAI_API_KEY`). The example in this repo already overrides the default with `provider: togetherai:zai-org/GLM-5.1`; remove the `provider:` line if you'd rather use OpenAI's default grader. To use a different TogetherAI model:
+The `llm-rubric` assertion uses OpenAI by default (same `OPENAI_API_KEY`). To use a different grader model, add a `provider` field:
 
 ```yaml
 - type: llm-rubric
-  provider: togetherai:meta-llama/Llama-3-70b-chat-hf
+  provider: openai:gpt-4o
   value: "Your rubric criteria here."
 ```
 
@@ -260,8 +247,12 @@ The `llm-rubric` assertion uses OpenAI by default (requires `OPENAI_API_KEY`). T
 - **Tool-usage flakiness**: The agent self-reports `tools_used` based on its own judgment. If it occasionally omits a tool, consider loosening the assertion to check for field existence only (e.g., `Array.isArray(d.tools_used)`) rather than requiring a specific tool name.
 - **Provider support**: promptfoo's Python provider runs the agent synchronously. For large crews, consider timeout settings in `promptfooconfig.yaml`.
 - **Rubric cost**: `llm-rubric` assertions make an additional LLM call per test case for grading. Budget accordingly.
-- **Cost**: Each test case makes one LLM call (plus one per rubric assertion). 10 cases × gpt-4o-mini ≈ $0.01 per eval run without rubric; slightly more with rubric.
+- **Cost**: Each test case makes one LLM call (plus one per rubric assertion). 11 cases × gpt-4o-mini ≈ $0.01 per eval run without rubric; slightly more with rubric.
 - **`crewai test` vs promptfoo**: These are complementary, not competing. Use `crewai test` for overall crew health; use promptfoo for specific output contracts and regression detection.
+
+## Maintenance Note
+
+This is a **reference quickstart**, not a maintained library. It was built to answer a specific community question and may not track every CrewAI or promptfoo release. If something breaks on a newer version, PRs are welcome — but no guarantee of ongoing support.
 
 ## Public Repo Checklist
 
@@ -269,7 +260,7 @@ Before publishing this repo:
 
 - Confirm `.env` is not committed. Only `.env.example` should be public.
 - Run `python -m py_compile agent.py`.
-- Run `npm run eval` with a real `TOGETHERAI_API_KEY` or `OPENAI_API_KEY`.
+- Run `npm run eval` with a real `OPENAI_API_KEY`.
 - Open `npm run view` and verify the latest run is inspectable.
 - Replace `git clone https://github.com/<your-username>/crewai-promptfoo-eval-quickstart.git` above after the GitHub repo exists.
 - Add a short GitHub description, for example: `CrewAI support-ticket eval quickstart using promptfoo`.

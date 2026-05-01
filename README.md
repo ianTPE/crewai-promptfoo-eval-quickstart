@@ -246,7 +246,7 @@ For cases where exact matching is too brittle (e.g., edge-case tickets), use `ll
   label: "rubric: security triage quality"
 ```
 
-The `llm-rubric` assertion uses OpenAI by default (requires `OPENAI_API_KEY`). If you only have a TogetherAI key, you can add a `provider` field:
+The `llm-rubric` assertion uses OpenAI by default (requires `OPENAI_API_KEY`). The example in this repo already overrides the default with `provider: togetherai:zai-org/GLM-5.1`; remove the `provider:` line if you'd rather use OpenAI's default grader. To use a different TogetherAI model:
 
 ```yaml
 - type: llm-rubric

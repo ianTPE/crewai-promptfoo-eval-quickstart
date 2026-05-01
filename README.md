@@ -35,7 +35,7 @@ A minimal, runnable example that shows how to **evaluate a CrewAI agent's output
 
 - Python 3.10+
 - Node.js 18+ (for promptfoo)
-- An OpenAI or TogetherAI API key (or another provider supported by CrewAI)
+- An API key for your chosen CrewAI LLM provider. This quickstart defaults to OpenAI; TogetherAI is included as an optional alternative.
 
 On Debian/Ubuntu, install the venv package first if `python -m venv .venv` fails:
 
